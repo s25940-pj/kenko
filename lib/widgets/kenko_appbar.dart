@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:kenko/main.dart';
 
 class KenkoAppBar extends StatelessWidget implements PreferredSizeWidget {
   const KenkoAppBar({
     super.key,
-    required this.widget,
+    required this.title,
   });
 
-  final MyHomePage widget;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +21,7 @@ class KenkoAppBar extends StatelessWidget implements PreferredSizeWidget {
             color: Colors.redAccent,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Text(
-              widget.title,
+              '$title 健康',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 24,

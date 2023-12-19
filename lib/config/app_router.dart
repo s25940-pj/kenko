@@ -12,8 +12,6 @@ class AppRouter {
         return AccountScreen.route();
       case SettingsScreen.routeName:
         return SettingsScreen.route();
-      case NewReminderScreen.routeName:
-        return NewReminderScreen.route();
 
       default:
         return _errorRoute();

@@ -62,12 +62,23 @@ class RemindersScreen extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              reminder.medicationId,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            BlocBuilder<MedicationBloc, MedicationState>(
+              builder: (context, state) {
+                if (state is MedicationsLoadSuccess) {
+                  final medication = state.medications.firstWhere(
+                    (medication) => medication.id == reminder.medicationId,
+                  );
+                  return Text(
+                    medication.name,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                } else {
+                  return const Text('Something went wrong!');
+                }
+              },
             ),
             BlocBuilder<ReminderBloc, ReminderState>(
               builder: (context, state) {

@@ -12,6 +12,8 @@ class AppRouter {
         return AccountScreen.route();
       case SettingsScreen.routeName:
         return SettingsScreen.route();
+      case NewReminderScreen.routeName:
+        return NewReminderScreen.route();
 
       default:
         return _errorRoute();
@@ -26,7 +28,7 @@ class AppRouter {
           title: const Text('Error'),
         ),
         body: const Center(
-          child: Text('Something went wrong!'),
+          child: Text('Route not found!'),
         ),
       ),
     );

@@ -5,10 +5,10 @@ class InputLabel extends StatefulWidget {
   final bool isRequired;
 
   const InputLabel({
-    Key? key,
+    super.key,
     required this.text,
     required this.isRequired,
-  }) : super(key: key);
+  });
 
   @override
   State<InputLabel> createState() => _InputLabelState();

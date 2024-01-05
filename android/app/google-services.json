@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "930880591706",
+    "project_id": "kenko-827fd",
+    "storage_bucket": "kenko-827fd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:930880591706:android:5b3ac104ffcf5594010563",
+        "android_client_info": {
+          "package_name": "com.example.kenko"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6O2ypHTBahJkeov0XPrzBYglkl2vH9NI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

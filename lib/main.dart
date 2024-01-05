@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kenko/blocs/blocs.dart';
 import 'package:kenko/config/app_router.dart';
-import 'package:kenko/repositories/reminder/reminder_repository.dart';
+import 'package:kenko/repositories/repositories.dart';
 import 'package:kenko/screens/screens.dart';
 
 void main() async {
@@ -22,7 +22,12 @@ class MyApp extends StatelessWidget {
         BlocProvider(
             create: (_) => ReminderBloc(
                   reminderRepository: ReminderRepository(),
-                )..add(LoadReminders()))
+                )..add(LoadReminders())),
+        BlocProvider(
+          create: (_) => MedicationBloc(
+            medicationRepository: MedicationRepository(),
+          )..add(LoadMedications()),
+        )
       ],
       child: MaterialApp(
         title: 'Kenko',

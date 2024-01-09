@@ -14,4 +14,11 @@ class ReminderRepository extends BaseReminderRepository {
         (snapshot) =>
             snapshot.docs.map((doc) => Reminder.fromSnapshot(doc)).toList());
   }
+
+  @override
+  Future<void> addNewReminder(Reminder reminder) {
+    return _firebaseFirestore
+        .collection('reminders')
+        .add(reminder.toDocument());
+  }
 }

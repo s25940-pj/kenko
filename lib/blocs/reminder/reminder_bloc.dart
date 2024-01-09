@@ -17,6 +17,7 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
         super(RemindersLoadInProgress()) {
     on<LoadReminders>(_onLoadReminders);
     on<UpdateReminders>(_onUpdateReminders);
+    on<AddReminder>(_onAddReminder);
   }
 
   void _onLoadReminders(LoadReminders event, Emitter<ReminderState> emit) {
@@ -28,5 +29,9 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
 
   void _onUpdateReminders(UpdateReminders event, Emitter<ReminderState> emit) {
     emit(RemindersLoadSuccess(reminders: event.reminders));
+  }
+
+  void _onAddReminder(AddReminder event, Emitter<ReminderState> emit) {
+    _reminderRepository.addNewReminder(event.reminder);
   }
 }

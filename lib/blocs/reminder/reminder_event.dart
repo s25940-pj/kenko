@@ -17,3 +17,12 @@ class UpdateReminders extends ReminderEvent {
   @override
   List<Object> get props => [reminders];
 }
+
+class AddReminder extends ReminderEvent {
+  final Reminder reminder;
+
+  const AddReminder(this.reminder);
+
+  @override
+  List<Object> get props => [reminder];
+}

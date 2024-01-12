@@ -28,9 +28,12 @@ class NewReminderScreen extends StatefulWidget {
 class _NewReminderScreenState extends State<NewReminderScreen> {
   final TextEditingController selectedMedicationNameController =
       TextEditingController();
+  final TextEditingController selectedMedicationDosageController =
+      TextEditingController();
   TimeOfDay selectedTime = TimeOfDay.now();
   DateTimeRange selectedDateTimeRange = DateTimeRange(
       start: DateTime.now(), end: DateTime.now().add(const Duration(days: 1)));
+  String selectedMedicationDosageUnitName = MedicationDosageUnit.units.name;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +68,13 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
                           if (medicationName != null) {
                             selectedMedicationNameController.text =
                                 medicationName;
+                            selectedMedicationDosageUnitName =
+                                getMedicationDosageUnitByMedicationType(
+                                        getMedicationTypeByMedicationName(
+                                            state.medications,
+                                            selectedMedicationNameController
+                                                .text))
+                                    .name;
                           }
                         });
                       },
@@ -111,10 +121,12 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
                       },
                       child: const Text('Select Date'),
                     ),
-                    const TextField(
+                    TextField(
+                      controller: selectedMedicationDosageController,
                       decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Enter dosage in ${getMedicationDosageUnitByMedicationType(state.medications.firstWhere((medication) => medication.name == selectedMedicationNameController.text).type)}'))}}',
+                        border: const OutlineInputBorder(),
+                        hintText:
+                            'Enter dosage in $selectedMedicationDosageUnitName',
                       ),
                       maxLines: 3,
                     ),
@@ -130,6 +142,8 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
                                 selectedMedicationNameController.text),
                             time: selectedTime,
                             dateTimeRange: selectedDateTimeRange,
+                            dosage: int.parse(
+                                selectedMedicationDosageController.text),
                           );
                           context.read<ReminderBloc>().add(
                                 AddReminder(reminder),
@@ -201,6 +215,16 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
       }
     }
     return "";
+  }
+
+  MedicationType getMedicationTypeByMedicationName(
+      List<Medication> medications, String medicationName) {
+    for (var medication in medications) {
+      if (medication.name == medicationName) {
+        return medication.type;
+      }
+    }
+    return MedicationType.tablet;
   }
 
   MedicationDosageUnit getMedicationDosageUnitByMedicationType(

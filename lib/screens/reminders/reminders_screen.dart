@@ -4,6 +4,8 @@ import 'package:kenko/blocs/blocs.dart';
 import 'package:kenko/models/models.dart';
 import 'package:kenko/widgets/widgets.dart';
 
+import '../../enums/enums.dart';
+
 class RemindersScreen extends StatelessWidget {
   const RemindersScreen({super.key});
 
@@ -58,57 +60,37 @@ class RemindersScreen extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8.0),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            BlocBuilder<MedicationBloc, MedicationState>(
-              builder: (context, state) {
-                if (state is MedicationsLoadSuccess) {
-                  final medication = state.medications.firstWhere(
-                    (medication) => medication.id == reminder.medicationId,
-                  );
-                  return Text(
+        padding: const EdgeInsets.all(12.0),
+        child: BlocBuilder<MedicationBloc, MedicationState>(
+          builder: (context, state) {
+            if (state is MedicationsLoadSuccess) {
+              final medication = state.medications.firstWhere(
+                (medication) => medication.id == reminder.medicationId,
+              );
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
                     medication.name,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
-                  );
-                } else {
-                  return const Text('Something went wrong!');
-                }
-              },
-            ),
-            BlocBuilder<ReminderBloc, ReminderState>(
-              builder: (context, state) {
-                return Row(
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        // context.read<ReminderBloc>().add(
-                        //       UpdateReminder(
-                        //         reminder.copyWith(isCompleted: true),
-                        //       ),
-                        //     );
-                      },
-                      icon: const Icon(Icons.add_task),
+                  ),
+                  Icon(getIconByMedicationType(medication.type), size: 18),
+                  Text(
+                    reminder.time.format(context),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
-                    IconButton(
-                      onPressed: () {
-                        // context.read<ReminderBloc>().add(
-                        //       DeleteReminder(
-                        //         reminder.copyWith(isCancelled: true),
-                        //       ),
-                        //     );
-                      },
-                      icon: const Icon(Icons.cancel),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
+                  ),
+                ],
+              );
+            } else {
+              return const Text('Something went wrong!');
+            }
+          },
         ),
       ),
     );
@@ -119,5 +101,16 @@ class RemindersScreen extends StatelessWidget {
       settings: const RouteSettings(name: routeName),
       builder: (_) => const RemindersScreen(),
     );
+  }
+
+  static IconData getIconByMedicationType(MedicationType type) {
+    switch (type) {
+      case MedicationType.tablet:
+        return Icons.medication;
+      case MedicationType.syrup:
+        return Icons.medication_liquid;
+      default:
+        return Icons.medication;
+    }
   }
 }

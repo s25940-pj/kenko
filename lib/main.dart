@@ -5,10 +5,34 @@ import 'package:kenko/blocs/blocs.dart';
 import 'package:kenko/config/app_router.dart';
 import 'package:kenko/repositories/repositories.dart';
 import 'package:kenko/screens/screens.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
-void main() async {
+
+void main() async {  
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  tz.initializeTimeZones();
+  
+
+
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('ic_launcher');
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+try {
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+  );
+} catch (e) {
+  print("Błąd inicjalizacji powiadomień lokalnych: $e");
+}
   runApp(const MyApp());
 }
 

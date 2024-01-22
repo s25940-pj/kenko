@@ -1,9 +1,11 @@
 import 'dart:async';
-
+import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:kenko/models/models.dart';
 import 'package:kenko/repositories/reminder/reminder_repository.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 part 'reminder_event.dart';
 part 'reminder_state.dart';
@@ -11,6 +13,9 @@ part 'reminder_state.dart';
 class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
   final ReminderRepository _reminderRepository;
   StreamSubscription? _remindersSubscription;
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   ReminderBloc({required ReminderRepository reminderRepository})
       : _reminderRepository = reminderRepository,
@@ -23,8 +28,8 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
   void _onLoadReminders(LoadReminders event, Emitter<ReminderState> emit) {
     _remindersSubscription?.cancel();
     _remindersSubscription = _reminderRepository.getReminders().listen(
-          (reminders) => add(UpdateReminders(reminders)),
-        );
+      (reminders) => add(UpdateReminders(reminders)),
+    );
   }
 
   void _onUpdateReminders(UpdateReminders event, Emitter<ReminderState> emit) {
@@ -35,3 +40,7 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
     _reminderRepository.addNewReminder(event.reminder);
   }
 }
+
+
+
+

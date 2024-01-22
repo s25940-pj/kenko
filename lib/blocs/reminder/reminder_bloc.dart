@@ -38,71 +38,9 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
 
   void _onAddReminder(AddReminder event, Emitter<ReminderState> emit) {
     _reminderRepository.addNewReminder(event.reminder);
-
-    // Planowanie powiadomienia
-    final tz.TZDateTime nextNotificationDateTime =
-        _getNextNotificationDateTime(event.reminder.time);
-
-    // Wywołanie funkcji do planowania powiadomienia
-    _zonedScheduleAlarmClockNotification(nextNotificationDateTime);
-
-    print('Powiadomienie zostało zaplanowane na: $nextNotificationDateTime');
-  }
-
-  Future<void> _zonedScheduleAlarmClockNotification(
-      tz.TZDateTime scheduledDate) async {
-
-        print('_zonedScheduleAlarmClockNotification');
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      123,
-      'scheduled alarm clock title',
-      'scheduled alarm clock body',
-      scheduledDate,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'alarm_clock_channel',
-          'Alarm Clock Channel',
-          channelDescription: 'Alarm Clock Notification',
-        ),
-      ),
-      androidScheduleMode: AndroidScheduleMode.alarmClock,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-    );
-  }
-
-  tz.TZDateTime _getNextNotificationDateTime(TimeOfDay timeOfDay) {
-    final now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime selectedDateTime = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      timeOfDay.hour,
-      timeOfDay.minute,
-    );
-
-    if (selectedDateTime.isBefore(now)) {
-      selectedDateTime = selectedDateTime.add(const Duration(days: 1));
-    }
-
-    return selectedDateTime;
-  }
-
-  DateTime _getNextNotificationDateTimeLocal(TimeOfDay timeOfDay) {
-    final now = DateTime.now();
-    DateTime selectedDateTime = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      timeOfDay.hour,
-      timeOfDay.minute,
-    );
-
-    if (selectedDateTime.isBefore(now)) {
-      selectedDateTime = selectedDateTime.add(const Duration(days: 1));
-    }
-
-    return selectedDateTime;
   }
 }
+
+
+
+

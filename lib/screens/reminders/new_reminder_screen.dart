@@ -6,6 +6,8 @@ import 'package:kenko/models/models.dart';
 import 'package:kenko/repositories/repositories.dart';
 import 'package:kenko/widgets/widgets.dart';
 import 'package:uuid/uuid.dart';
+import '../../api/notification_api.dart';
+
 
 import '../../enums/enums.dart';
 
@@ -103,6 +105,7 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
                           });
                         }
                       },
+                      
                       child: const Text('Select Time'),
                     ),
                     ElevatedButton(
@@ -135,6 +138,13 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
                           reminderRepository: ReminderRepository()),
                       child: ElevatedButton(
                         onPressed: () {
+                          if (selectedMedicationDosageController.text.isNotEmpty) {
+                              NotificationApi.scheduleNotificationAtTime(
+                                timeOfDay: selectedTime,
+                                medicationName: selectedMedicationNameController.text,
+                                dosage: int.parse(selectedMedicationDosageController.text),
+                              );
+                            }
                           var reminder = Reminder(
                             id: const Uuid().v4(),
                             medicationId: _getMedicationIdFromName(
@@ -172,6 +182,7 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
       ),
     );
   }
+  
 
   Column _inputField(
     String field,

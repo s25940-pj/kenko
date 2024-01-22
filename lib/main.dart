@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kenko/api/notification_api.dart';
 import 'package:kenko/blocs/blocs.dart';
 import 'package:kenko/config/app_router.dart';
 import 'package:kenko/repositories/repositories.dart';
@@ -13,28 +14,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   tz.initializeTimeZones();
-  
-
-
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('ic_launcher');
-
-  const InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-  );
-
-try {
-  await flutterLocalNotificationsPlugin.initialize(
-    initializationSettings,
-  );
-} catch (e) {
-  print("Błąd inicjalizacji powiadomień lokalnych: $e");
-}
+  NotificationApi.init();
   runApp(const MyApp());
 }
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -61,6 +45,7 @@ class MyApp extends StatelessWidget {
         onGenerateRoute: AppRouter.onGenerateRoute,
         initialRoute: RemindersScreen.routeName,
         home: const RemindersScreen(),
+        
       ),
     );
   }

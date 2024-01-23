@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:kenko/models/models.dart';
 import 'package:kenko/repositories/reminder/reminder_repository.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
 
 part 'reminder_event.dart';
 part 'reminder_state.dart';

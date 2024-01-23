@@ -6,7 +6,6 @@ import 'package:kenko/blocs/blocs.dart';
 import 'package:kenko/config/app_router.dart';
 import 'package:kenko/repositories/repositories.dart';
 import 'package:kenko/screens/screens.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 

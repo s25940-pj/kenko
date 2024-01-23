@@ -8,7 +8,6 @@ import 'package:kenko/widgets/widgets.dart';
 import 'package:uuid/uuid.dart';
 import '../../api/notification_api.dart';
 
-
 import '../../enums/enums.dart';
 
 class NewReminderScreen extends StatefulWidget {
@@ -33,7 +32,7 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
   final TextEditingController selectedMedicationDosageController =
       TextEditingController();
   TimeOfDay selectedTime = TimeOfDay.now();
-  DateTimeRange selectedDateTimeRange = DateTimeRange(
+  DateTimeRange selectedDateRange = DateTimeRange(
       start: DateTime.now(), end: DateTime.now().add(const Duration(days: 1)));
   String selectedMedicationDosageUnitName = MedicationDosageUnit.units.name;
 
@@ -105,7 +104,6 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
                           });
                         }
                       },
-                      
                       child: const Text('Select Time'),
                     ),
                     ElevatedButton(
@@ -113,12 +111,12 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
                         final DateTimeRange? dateTimeRange =
                             await showDateRangePicker(
                                 context: context,
-                                initialDateRange: selectedDateTimeRange,
+                                initialDateRange: selectedDateRange,
                                 firstDate: DateTime(DateTime.now().year, 1),
                                 lastDate: DateTime(DateTime.now().year + 1, 1));
                         if (dateTimeRange != null) {
                           setState(() {
-                            selectedDateTimeRange = dateTimeRange;
+                            selectedDateRange = dateTimeRange;
                           });
                         }
                       },
@@ -138,20 +136,25 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
                           reminderRepository: ReminderRepository()),
                       child: ElevatedButton(
                         onPressed: () {
-                          if (selectedMedicationDosageController.text.isNotEmpty) {
-                              NotificationApi.scheduleNotificationAtTime(
-                                timeOfDay: selectedTime,
-                                medicationName: selectedMedicationNameController.text,
-                                dosage: int.parse(selectedMedicationDosageController.text),
-                              );
-                            }
+                          if (selectedMedicationDosageController
+                              .text.isNotEmpty) {
+                            NotificationApi
+                                .scheduleMultipleNotificationsAtDateTimeRange(
+                              dateRange: selectedDateRange,
+                              selectedTime: selectedTime,
+                              medicationName:
+                                  selectedMedicationNameController.text,
+                              dosage: int.parse(
+                                  selectedMedicationDosageController.text),
+                            );
+                          }
                           var reminder = Reminder(
                             id: const Uuid().v4(),
                             medicationId: _getMedicationIdFromName(
                                 state.medications,
                                 selectedMedicationNameController.text),
                             time: selectedTime,
-                            dateTimeRange: selectedDateTimeRange,
+                            dateTimeRange: selectedDateRange,
                             dosage: int.parse(
                                 selectedMedicationDosageController.text),
                           );
@@ -182,7 +185,6 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
       ),
     );
   }
-  
 
   Column _inputField(
     String field,

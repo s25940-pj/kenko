@@ -26,6 +26,7 @@ class _AccountScreenState extends State<AccountScreen> {
   bool isEmailValid = false;
   TextEditingController userNameController = TextEditingController();
   TextEditingController usermailController = TextEditingController();
+  bool isNotRegisterVisible = true;
 
   @override
   void initState() {
@@ -37,19 +38,19 @@ class _AccountScreenState extends State<AccountScreen> {
     await fetUserIdFromSharedPreferences();
     await fetchDataFromFirebase();
   }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: KenkoAppBar(title: 'Account'),
-      bottomNavigationBar: KenkoNavBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: userId.isEmpty || userId=='0'
-            ? buildLoginScreen()
-            : BuildeLoggedInScreen(),
-      ),
-    );
-  }
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        appBar: KenkoAppBar(title: 'Account'),
+        bottomNavigationBar: KenkoNavBar(),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: userId.isEmpty || userId=='0'
+              ? buildLoginScreen()
+              : BuildeLoggedInScreen(),
+        ),
+      );
+    }
   Future<void> fetchDataFromFirebase() async {
     if(userId.isNotEmpty && userId !='0'){
       final DocumentReference userDocRef = FirebaseFirestore.instance.collection('users').doc(userId);
@@ -70,28 +71,71 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
   Widget buildLoginScreen() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TextField(
-          controller: userNameController,
-          decoration: InputDecoration(labelText: "Username"),
-        ),
-        SizedBox(height: 16),
-        TextField(
-          controller: usermailController,
-          decoration: InputDecoration(
-            labelText: "Email",
-            errorText: isEmailValid ? 'niepoprawny email lub login' : null,
+    if(isNotRegisterVisible){
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("Zaloguj się"),
+          TextField(
+            controller: userNameController,
+            decoration: InputDecoration(labelText: "Username"),
           ),
-        ),
-        SizedBox(height: 16),
-        ElevatedButton(onPressed: () async  {
-          await checkUserExis();
-          saveUserID();
-        }, child: Text('Login'))
-      ],
-    );
+          SizedBox(height: 16),
+          TextField(
+            controller: usermailController,
+            decoration: InputDecoration(
+              labelText: "Email",
+              errorText: isEmailValid ? 'niepoprawny email lub login' : null,
+            ),
+          ),
+          SizedBox(height: 16),
+          ElevatedButton(onPressed: () async  {
+            await checkUserExis();
+            saveUserID();
+          }, child: Text('Login')),
+          ElevatedButton(onPressed: (){
+            setState(() {
+              isNotRegisterVisible = false;
+              buildLoginScreen();
+            });
+          }, child: Text('Zarejestruj się'),
+          ),
+
+        ],
+      );
+    }else{
+      return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children:[
+            Text("Rejestracja"),
+            ListTile(
+              title: TextField(
+                controller: userNameController,
+                decoration: InputDecoration(labelText: "Imię"),
+              ),
+            ),
+            ListTile(
+              title: TextField(
+                controller: usermailController,
+                decoration: InputDecoration(labelText: "E-mail"),
+              ),
+            ),
+            ElevatedButton(onPressed: () async{
+              sendAccToFirebase();
+              isNotRegisterVisible = true;
+              buildLoginScreen();
+            }, child: Text('potwierdz'),
+            ),
+            ElevatedButton(onPressed: (){
+              setState(() {
+                isNotRegisterVisible = true;
+                buildLoginScreen();
+              });
+            }, child: Text('Wróć do Logowania'),
+            ),
+          ]
+      );
+    }
   }
   Future <void> checkUserExis() async {
     final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -99,12 +143,14 @@ class _AccountScreenState extends State<AccountScreen> {
         .where('name', isEqualTo: userNameController.text)
         .where('mail', isEqualTo: usermailController.text)
         .get();
+
     if (querySnapshot.docs.isNotEmpty) {
       final DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
       setState(() {
         userName = documentSnapshot['name'];
         userEmail = documentSnapshot['mail'];
         userId = documentSnapshot.id;
+        print("jest taki user");
       });
     } else {
       setState(() {
@@ -167,7 +213,6 @@ class _AccountScreenState extends State<AccountScreen> {
       MaterialPageRoute(builder: (context)=>const AccountScreen()),
     );
   }
-
   Future<void> fetUserIdFromSharedPreferences() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String storedUserId = prefs.getString('userId') ?? '';
@@ -177,4 +222,19 @@ class _AccountScreenState extends State<AccountScreen> {
     });
     fetchDataFromFirebase();
   }
+
+  void sendAccToFirebase() async {
+    int randomId = DateTime.now().millisecondsSinceEpoch;
+    String ID = randomId.toString();
+    await FirebaseFirestore.instance.collection('users').doc(ID).set(
+        {
+          'name': userNameController.text,
+          'mail': usermailController.text,
+        });
+    usermailController.clear();
+    userNameController.clear();
+    isNotRegisterVisible = true;
+    buildLoginScreen();
+  }
+
 }

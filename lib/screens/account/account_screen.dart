@@ -11,7 +11,7 @@ class AccountScreen extends StatefulWidget {
   @override
   State<AccountScreen> createState() => _AccountScreenState();
 
-  static Route route()  {
+  static Route route() {
     return MaterialPageRoute(
       settings: const RouteSettings(name: routeName),
       builder: (_) => const AccountScreen(),
@@ -34,26 +34,30 @@ class _AccountScreenState extends State<AccountScreen> {
     fetUserIdFromSharedPreferences();
     fetchDataFromFirebase();
   }
-  Future<void> initStateAsync() async{
+
+  Future<void> initStateAsync() async {
     await fetUserIdFromSharedPreferences();
     await fetchDataFromFirebase();
   }
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        appBar: KenkoAppBar(title: 'Account'),
-        bottomNavigationBar: KenkoNavBar(),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: userId.isEmpty || userId=='0'
-              ? buildLoginScreen()
-              : BuildeLoggedInScreen(),
-        ),
-      );
-    }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const KenkoAppBar(title: 'Account'),
+      bottomNavigationBar: const KenkoNavBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: userId.isEmpty || userId == '0'
+            ? buildLoginScreen()
+            : BuildLoggedInScreen(),
+      ),
+    );
+  }
+
   Future<void> fetchDataFromFirebase() async {
-    if(userId.isNotEmpty && userId !='0'){
-      final DocumentReference userDocRef = FirebaseFirestore.instance.collection('users').doc(userId);
+    if (userId.isNotEmpty && userId != '0') {
+      final DocumentReference userDocRef =
+          FirebaseFirestore.instance.collection('users').doc(userId);
       try {
         DocumentSnapshot documentSnapshot = await userDocRef.get();
         if (documentSnapshot.exists) {
@@ -61,7 +65,7 @@ class _AccountScreenState extends State<AccountScreen> {
             userName = documentSnapshot['name'];
             userEmail = documentSnapshot['mail'];
           });
-          print('UserId from Firestore: $userId'); // Dodaj ten wypis
+          print('UserId from Firestore: $userId');
         } else {
           print("doc not exist");
         }
@@ -70,74 +74,80 @@ class _AccountScreenState extends State<AccountScreen> {
       }
     }
   }
+
   Widget buildLoginScreen() {
-    if(isNotRegisterVisible){
+    if (isNotRegisterVisible) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("Zaloguj się"),
+          const Text("Login"),
           TextField(
             controller: userNameController,
-            decoration: InputDecoration(labelText: "Username"),
+            decoration: const InputDecoration(labelText: "Username"),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           TextField(
             controller: usermailController,
             decoration: InputDecoration(
               labelText: "Email",
-              errorText: isEmailValid ? 'niepoprawny email lub login' : null,
+              errorText: isEmailValid ? 'Invalid email' : null,
             ),
           ),
-          SizedBox(height: 16),
-          ElevatedButton(onPressed: () async  {
-            await checkUserExis();
-            saveUserID();
-          }, child: Text('Login')),
-          ElevatedButton(onPressed: (){
-            setState(() {
-              isNotRegisterVisible = false;
-              buildLoginScreen();
-            });
-          }, child: Text('Zarejestruj się'),
-          ),
-
-        ],
-      );
-    }else{
-      return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children:[
-            Text("Rejestracja"),
-            ListTile(
-              title: TextField(
-                controller: userNameController,
-                decoration: InputDecoration(labelText: "Imię"),
-              ),
-            ),
-            ListTile(
-              title: TextField(
-                controller: usermailController,
-                decoration: InputDecoration(labelText: "E-mail"),
-              ),
-            ),
-            ElevatedButton(onPressed: () async{
-              sendAccToFirebase();
-              isNotRegisterVisible = true;
-              buildLoginScreen();
-            }, child: Text('potwierdz'),
-            ),
-            ElevatedButton(onPressed: (){
+          const SizedBox(height: 16),
+          ElevatedButton(
+              onPressed: () async {
+                await checkUserExis();
+                saveUserID();
+              },
+              child: const Text('Login')),
+          ElevatedButton(
+            onPressed: () {
               setState(() {
-                isNotRegisterVisible = true;
+                isNotRegisterVisible = false;
                 buildLoginScreen();
               });
-            }, child: Text('Wróć do Logowania'),
-            ),
-          ]
+            },
+            child: const Text('Register'),
+          ),
+        ],
       );
+    } else {
+      return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        const Text("Registration"),
+        ListTile(
+          title: TextField(
+            controller: userNameController,
+            decoration: const InputDecoration(labelText: "Name"),
+          ),
+        ),
+        ListTile(
+          title: TextField(
+            controller: usermailController,
+            decoration: const InputDecoration(labelText: "Email"),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            sendAccToFirebase();
+            isNotRegisterVisible = true;
+            buildLoginScreen();
+          },
+          child: const Text('Confirm'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              isNotRegisterVisible = true;
+              buildLoginScreen();
+            });
+          },
+          child: const Text('Back'),
+        ),
+      ]);
     }
   }
-  Future <void> checkUserExis() async {
+
+  Future<void> checkUserExis() async {
     final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('name', isEqualTo: userNameController.text)
@@ -159,61 +169,65 @@ class _AccountScreenState extends State<AccountScreen> {
       });
     }
   }
-  Widget? BuildeLoggedInScreen() {
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ListTile(
-            title: Text(
-              'Imię',
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Text(
-              userName,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
+
+  Widget? BuildLoggedInScreen() {
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      ListTile(
+        title: const Text(
+          'Imię',
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
           ),
-          ListTile(
-            title: Text(
-              'E-mail',
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Text(
-              userEmail,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+        ),
+        subtitle: Text(
+          userName,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
           ),
-          ElevatedButton(onPressed: () async  {
+        ),
+      ),
+      ListTile(
+        title: const Text(
+          'E-mail',
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(
+          userEmail,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      ElevatedButton(
+          onPressed: () async {
             await checkUserExis();
             Logout();
-          }, child: Text('wyloguj'))
-        ]);
+          },
+          child: const Text('Log out'))
+    ]);
   }
-  Future<void>saveUserID() async{
+
+  Future<void> saveUserID() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString('userId', userId);
   }
-  Future <void>Logout() async{
+
+  Future<void> Logout() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.clear();
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context)=>const AccountScreen()),
+      MaterialPageRoute(builder: (context) => const AccountScreen()),
     );
   }
-  Future<void> fetUserIdFromSharedPreferences() async{
+
+  Future<void> fetUserIdFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String storedUserId = prefs.getString('userId') ?? '';
     print('Stored userId from SharedPreferences: $storedUserId');
@@ -226,15 +240,13 @@ class _AccountScreenState extends State<AccountScreen> {
   void sendAccToFirebase() async {
     int randomId = DateTime.now().millisecondsSinceEpoch;
     String ID = randomId.toString();
-    await FirebaseFirestore.instance.collection('users').doc(ID).set(
-        {
-          'name': userNameController.text,
-          'mail': usermailController.text,
-        });
+    await FirebaseFirestore.instance.collection('users').doc(ID).set({
+      'name': userNameController.text,
+      'mail': usermailController.text,
+    });
     usermailController.clear();
     userNameController.clear();
     isNotRegisterVisible = true;
     buildLoginScreen();
   }
-
 }

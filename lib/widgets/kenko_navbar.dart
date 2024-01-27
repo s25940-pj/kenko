@@ -17,14 +17,6 @@ class KenkoNavBar extends StatelessWidget {
           children: [
             IconButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/medications');
-                },
-                icon: const Icon(
-                  Icons.medication_outlined,
-                  color: Colors.white,
-                )),
-            IconButton(
-                onPressed: () {
                   Navigator.pushNamed(context, '/');
                 },
                 icon: const Icon(
@@ -37,14 +29,6 @@ class KenkoNavBar extends StatelessWidget {
                 },
                 icon: const Icon(
                   Icons.account_circle_outlined,
-                  color: Colors.white,
-                )),
-            IconButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/settings');
-                },
-                icon: const Icon(
-                  Icons.settings_outlined,
                   color: Colors.white,
                 )),
           ],

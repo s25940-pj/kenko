@@ -6,12 +6,8 @@ class AppRouter {
     switch (settings.name) {
       case RemindersScreen.routeName:
         return RemindersScreen.route();
-      case MedicationsScreen.routeName:
-        return MedicationsScreen.route();
       case AccountScreen.routeName:
         return AccountScreen.route();
-      case SettingsScreen.routeName:
-        return SettingsScreen.route();
       case NewReminderScreen.routeName:
         return NewReminderScreen.route();
 

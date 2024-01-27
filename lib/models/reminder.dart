@@ -8,13 +8,15 @@ class Reminder extends Equatable {
   final TimeOfDay time;
   final DateTimeRange dateTimeRange;
   final int dosage;
+  final String userId;
 
   const Reminder(
       {required this.id,
       required this.medicationId,
       required this.time,
       required this.dateTimeRange,
-      required this.dosage});
+      required this.dosage,
+      required this.userId});
 
   @override
   List<Object> get props => [id, medicationId, time];
@@ -28,6 +30,7 @@ class Reminder extends Equatable {
           start: _createDateFromString(snap['dateTimeRange']['start']),
           end: _createDateFromString(snap['dateTimeRange']['end'])),
       dosage: snap['dosage'],
+      userId: snap['userId'],
     );
   }
 
@@ -40,6 +43,7 @@ class Reminder extends Equatable {
         'end': _createDateStringFromDateTime(dateTimeRange.end),
       },
       'dosage': dosage,
+      'userId': userId,
     };
   }
 

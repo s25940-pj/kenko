@@ -3,13 +3,39 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kenko/blocs/blocs.dart';
 import 'package:kenko/models/models.dart';
 import 'package:kenko/widgets/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../enums/enums.dart';
 
-class RemindersScreen extends StatelessWidget {
+class RemindersScreen extends StatefulWidget {
   const RemindersScreen({super.key});
 
   static const String routeName = '/reminders';
+
+  @override
+  State<RemindersScreen> createState() => _RemindersScreenState();
+
+  static Route route() {
+    return MaterialPageRoute(
+      settings: const RouteSettings(name: routeName),
+      builder: (_) => const RemindersScreen(),
+    );
+  }
+
+  static IconData getIconByMedicationType(MedicationType type) {
+    switch (type) {
+      case MedicationType.tablet:
+        return Icons.medication;
+      case MedicationType.syrup:
+        return Icons.medication_liquid;
+      default:
+        return Icons.medication;
+    }
+  }
+}
+
+class _RemindersScreenState extends State<RemindersScreen> {
+  String userId = '';
 
   @override
   Widget build(BuildContext context) {
@@ -23,24 +49,45 @@ class RemindersScreen extends StatelessWidget {
             );
           }
           if (state is RemindersLoadSuccess) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: state.reminders.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return _reminderCard(
-                        context,
-                        state.reminders[index],
-                      );
-                    },
-                  ),
-                ],
-              ),
-            );
+            fetchUserIdFromSharedPreferences();
+
+            List<Reminder> reminders = List.empty(growable: true);
+            if (userId != '') {
+              reminders = state.reminders
+                  .where((reminder) => reminder.userId == userId)
+                  .toList();
+
+              if (reminders.isEmpty) {
+                return const Center(
+                  child: Text('You have no reminders'),
+                );
+              }
+            }
+
+            if (reminders.isEmpty) {
+              return const Center(
+                child: Text('Log in to see your reminders'),
+              );
+            } else {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: state.reminders.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return _reminderCard(
+                          context,
+                          reminders[index],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              );
+            }
           } else {
             return const Text('Something went wrong!');
           }
@@ -77,7 +124,8 @@ class RemindersScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Icon(getIconByMedicationType(medication.type), size: 18),
+                  Icon(RemindersScreen.getIconByMedicationType(medication.type),
+                      size: 18),
                   Text(
                     reminder.time.format(context),
                     style: const TextStyle(
@@ -96,21 +144,12 @@ class RemindersScreen extends StatelessWidget {
     );
   }
 
-  static Route route() {
-    return MaterialPageRoute(
-      settings: const RouteSettings(name: routeName),
-      builder: (_) => const RemindersScreen(),
-    );
-  }
-
-  static IconData getIconByMedicationType(MedicationType type) {
-    switch (type) {
-      case MedicationType.tablet:
-        return Icons.medication;
-      case MedicationType.syrup:
-        return Icons.medication_liquid;
-      default:
-        return Icons.medication;
-    }
+  Future<void> fetchUserIdFromSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String storedUserId = prefs.getString('userId') ?? '';
+    print('Stored userId from SharedPreferences: $storedUserId');
+    setState(() {
+      userId = storedUserId;
+    });
   }
 }

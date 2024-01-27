@@ -5,6 +5,7 @@ import 'package:kenko/enums/medication_dosage_unit.dart';
 import 'package:kenko/models/models.dart';
 import 'package:kenko/repositories/repositories.dart';
 import 'package:kenko/widgets/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../../api/notification_api.dart';
 
@@ -36,6 +37,7 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
       start: DateTime.now(), end: DateTime.now().add(const Duration(days: 1)));
   String selectedMedicationDosageUnitName = MedicationDosageUnit.units.name;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  String userId = '';
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +58,7 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
             if (state is MedicationsLoadSuccess) {
               selectedMedicationNameController.text =
                   _getMedicationNames(state.medications).first;
+              fetchUserIdFromSharedPreferences();
               return Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -202,6 +205,7 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
                                 dateTimeRange: selectedDateRange,
                                 dosage: int.parse(
                                     selectedMedicationDosageController.text),
+                                userId: userId,
                               );
                               context.read<ReminderBloc>().add(
                                     AddReminder(reminder),
@@ -271,5 +275,14 @@ class _NewReminderScreenState extends State<NewReminderScreen> {
       default:
         return MedicationDosageUnit.units;
     }
+  }
+
+  Future<void> fetchUserIdFromSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String storedUserId = prefs.getString('userId') ?? '';
+    print('Stored userId from SharedPreferences: $storedUserId');
+    setState(() {
+      userId = storedUserId;
+    });
   }
 }
